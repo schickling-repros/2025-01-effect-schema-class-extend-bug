@@ -63,6 +63,10 @@ This limitation means you cannot extend Schema.Class while preserving the class 
 bun run repro.ts
 ```
 
+## Related Issue
+
+This reproduction is linked to: https://github.com/Effect-TS/effect/issues/5336
+
 ## Environment
 
 - Effect: 3.17.6
