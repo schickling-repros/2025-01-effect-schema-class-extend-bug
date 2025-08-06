@@ -11,7 +11,7 @@ console.log('Testing Effect Schema class extension behavior...\n')
 // "Unsupported schema or overlapping types: cannot extend SomeClass with { readonly age: number }"
 console.log('❌ FailingSchema (direct extend): SomeClass.pipe(Schema.extend(...)) throws compilation error')
 
-// This works fine
+// This works as a workaround
 const PassingSchema = SomeClass.pipe(Schema.omit(), Schema.extend(Schema.Struct({ age: Schema.Number })))
 
 const testData = {
@@ -23,27 +23,19 @@ const testData = {
 console.log('Test data:', testData)
 
 try {
-  console.log('\n--- Testing PassingSchema (omit + extend) ---')
+  console.log('\n--- Testing PassingSchema (omit + extend workaround) ---')
   const passingResult = Schema.decodeUnknownSync(PassingSchema)(testData)
   console.log('✅ PassingSchema succeeded:', passingResult)
-  console.log('Result type:', typeof passingResult)
-  console.log('Result instanceof SomeClass:', passingResult instanceof SomeClass)
-  console.log('Result:', passingResult)
 } catch (error) {
   console.log('❌ PassingSchema failed:', error.message)
 }
 
-console.log('\n--- Schema Types Comparison ---')
+console.log('\n--- Schema AST Types ---')
 console.log('SomeClass AST type:', SomeClass.ast._tag)
 console.log('PassingSchema AST type:', PassingSchema.ast._tag)
 
-// Try to understand the difference
-console.log('\n--- Investigating the difference ---')
+// Show the difference
+console.log('\n--- Understanding the difference ---')
 const OmittedSchema = SomeClass.pipe(Schema.omit())
 console.log('SomeClass.pipe(Schema.omit()) AST type:', OmittedSchema.ast._tag)
-
-console.log('\n--- Creating new instance of SomeClass ---')
-const someClassInstance = new SomeClass({ id: '123', name: 'John Doe' })
-console.log('SomeClass instance:', someClassInstance)
-console.log('SomeClass instance type:', typeof someClassInstance)
-console.log('SomeClass instance instanceof SomeClass:', someClassInstance instanceof SomeClass)
+console.log('This conversion from Transformation -> TypeLiteral enables Schema.extend() to work')

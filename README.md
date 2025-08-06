@@ -1,6 +1,6 @@
 # Effect Schema Class Extension Bug Reproduction
 
-This repository demonstrates a limitation in Effect Schema when trying to extend Schema.Class directly vs using omit() first.
+This repository demonstrates a limitation in Effect Schema when trying to extend Schema.Class directly.
 
 ## The Issue
 
@@ -15,7 +15,7 @@ class SomeClass extends Schema.Class<SomeClass>('SomeClass')({
 // ❌ This fails with: "Unsupported schema or overlapping types"
 const FailingSchema = SomeClass.pipe(Schema.extend(Schema.Struct({ age: Schema.Number })))
 
-// ✅ This works fine
+// ✅ This works as a workaround
 const PassingSchema = SomeClass.pipe(Schema.omit(), Schema.extend(Schema.Struct({ age: Schema.Number })))
 ```
 
@@ -29,33 +29,19 @@ const PassingSchema = SomeClass.pipe(Schema.omit(), Schema.extend(Schema.Struct(
 ### PassingSchema (Omit + Extension)
 - **Result**: ✅ Successfully creates and decodes data
 - **AST Type**: `TypeLiteral` 
-- **Decoded Result**: Plain object `{ id: "123", name: "John Doe", age: 30 }`
-- **instanceof SomeClass**: `false` (loses class identity)
+- **Decoded Result**: `{ id: "123", name: "John Doe", age: 30 }`
 
 ## Root Cause Analysis
 
 The issue stems from the different AST types:
 
-1. **Schema.Class**: Creates a `Transformation` AST that maintains class identity
+1. **Schema.Class**: Creates a `Transformation` AST
 2. **Schema.omit()**: Converts the `Transformation` to a `TypeLiteral` 
 3. **Schema.extend()**: Can only extend `TypeLiteral` schemas, not `Transformation` schemas
 
-## Trade-offs
-
-### Direct Extension (if it worked)
-- ✅ Would preserve class identity
-- ✅ `instanceof` checks would work
-- ❌ Currently impossible due to Effect limitation
-
-### Omit + Extension (current workaround)
-- ✅ Successfully extends the schema
-- ✅ Decoding works correctly
-- ❌ Loses class identity (becomes plain object)
-- ❌ `instanceof` checks return `false`
-
 ## Impact
 
-This limitation means you cannot extend Schema.Class while preserving the class prototype chain. The decoded result becomes a plain object rather than an instance of the original class.
+This limitation means you cannot extend Schema.Class directly and must use the `Schema.omit()` workaround first.
 
 ## Reproduction
 
