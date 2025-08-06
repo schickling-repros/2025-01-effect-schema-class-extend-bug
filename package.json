@@ -1,0 +1,14 @@
+{
+  "name": "effect-schema-class-extend-repro",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "repro": "bun run repro.ts"
+  },
+  "dependencies": {
+    "effect": "^3.11.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
